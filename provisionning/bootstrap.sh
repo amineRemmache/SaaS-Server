@@ -6,36 +6,28 @@
 ## If you use a different version of Ubuntu or a different Ubuntu Vagrant box test this again
 #
 
-sudo iptables -F bin/iptables-legacy
-
-sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
-
-sudo update-alternatives --set iptables /usr/sbin/iptables-legacy
-
-sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
-
 # echo "[TASK 1] Disable and turn off SWAP"
-# sed -i '/swap/d' /etc/fstab
-# swapoff -a
+sed -i '/swap/d' /etc/fstab
+swapoff -a
 
 # echo "[TASK 2] Stop and Disable firewall"
-# systemctl disable --now ufw >/dev/null 2>&1
+systemctl disable --now ufw >/dev/null 2>&1
 
 # echo "[TASK 3] Enable and Load Kernel modules"
-# cat >>/etc/modules-load.d/containerd.conf<<EOF
-# overlay
-# br_netfilter
-# EOF
-# modprobe overlay
-# modprobe br_netfilter
+cat >>/etc/modules-load.d/containerd.conf<<EOF
+overlay
+br_netfilter
+EOF
+modprobe overlay
+modprobe br_netfilter
 
 # echo "[TASK 4] Add Kernel settings"
-# cat >>/etc/sysctl.d/kubernetes.conf<<EOF
-# net.bridge.bridge-nf-call-ip6tables = 1
-# net.bridge.bridge-nf-call-iptables  = 1
-# net.ipv4.ip_forward                 = 1
-# EOF
-# sysctl --system >/dev/null 2>&1
+cat >>/etc/sysctl.d/kubernetes.conf<<EOF
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables  = 1
+net.ipv4.ip_forward                 = 1
+EOF
+sysctl --system >/dev/null 2>&1
 
 # echo "[TASK 5] Install containerd runtime"
 # apt update -qq >/dev/null 2>&1
@@ -63,8 +55,15 @@ sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
 # echo "export TERM=xterm" >> /etc/bash.bashrc
 
 # echo "[TASK 10] Update /etc/hosts file"
-# cat >>/etc/hosts<<EOF
-# 172.16.16.100   kmaster.example.com     kmaster
-# 172.16.16.101   kworker1.example.com    kworker1
-# 172.16.16.102   kworker2.example.com    kworker2
-# EOF
+cat >>/etc/hosts<<EOF
+172.16.16.100   kmaster.insim.dz     kmaster
+192.168.1.211   kworker1.insim.dz    kworker1
+192.168.1.212   kworker2.insim.dz    kworker2
+EOF
+
+
+# echo "[TASK 11] iptables"
+sudo iptables -F bin/iptables-legacy
+sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
+sudo update-alternatives --set iptables /usr/sbin/iptables-legacy
+sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
