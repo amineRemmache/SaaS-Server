@@ -8,13 +8,13 @@ kubernetes_dashboard_url="https://raw.githubusercontent.com/kubernetes/dashboard
 # NB this installs in the kubernetes-dashboard namespace.
 # see https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/
 # see https://github.com/kubernetes/dashboard/releases
-kubectl apply -f "$kubernetes_dashboard_url"
+sudo kubectl apply -f "$kubernetes_dashboard_url"
 
 # create the admin user for use in the kubernetes-dashboard.
 # see https://github.com/kubernetes/dashboard/blob/master/docs/user/access-control/creating-sample-user.md
 # see https://github.com/kubernetes/dashboard/blob/master/docs/user/access-control/README.md
 # see https://kubernetes.io/docs/concepts/configuration/secret/#service-account-token-secrets
-kubectl apply -n kubernetes-dashboard -f - <<'EOF'
+sudo kubectl apply -n kubernetes-dashboard -f - <<'EOF'
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -43,7 +43,7 @@ subjects:
     namespace: kubernetes-dashboard
 EOF
 # save the admin token.
-kubectl -n kubernetes-dashboard get secret admin -o json \
+sudo kubectl -n kubernetes-dashboard get secret admin -o json \
   | jq -r .data.token \
   | base64 --decode \
   >/vagrant/tmp/admin-token.txt
@@ -58,7 +58,7 @@ kubectl -n kubernetes-dashboard get secret admin -o json \
 # see https://docs.traefik.io/routing/providers/kubernetes-crd/
 # see https://kubernetes.io/docs/concepts/services-networking/ingress/
 # see https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#ingress-v1-networking-k8s-io
-kubectl apply -n kubernetes-dashboard -f - <<'EOF'
+sudo kubectl apply -n kubernetes-dashboard -f - <<'EOF'
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:

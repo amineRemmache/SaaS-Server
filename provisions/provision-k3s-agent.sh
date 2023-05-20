@@ -1,12 +1,15 @@
 #!/bin/bash
 set -euxo pipefail
 
+k3s_command="$1"; shift
 k3s_channel="$1"; shift
 k3s_version="$1"; shift
 k3s_token="$1"; shift
 ip_address="$1"; shift
-k3s_url="https://s.$(hostname --domain):6443"
 
+k3s_url="https://s1.$(hostname --domain):6443"
+# k3s_extra_args=''
+# k3s_extra_args="$k3s_extra_args --cluster-join"
 # configure the motd.
 # NB this was generated at http://patorjk.com/software/taag/#p=display&f=Big&t=k3s%0Aagent.
 #    it could also be generated with figlet.org.
@@ -25,10 +28,14 @@ cat >/etc/motd <<'EOF'
         |___/
 
 EOF
+# set the extra hosts.
+cat >>/etc/hosts <<EOF
+10.11.0.11 s1.example.test
+EOF
 
 # install k3s.
 # see https://docs.k3s.io/reference/agent-config
-curl -sfL https://raw.githubusercontent.com/k3s-io/k3s/$k3s_version/install.sh \
+sudo curl -sfL https://raw.githubusercontent.com/k3s-io/k3s/$k3s_version/install.sh \
     | \
         INSTALL_K3S_CHANNEL="$k3s_channel" \
         INSTALL_K3S_VERSION="$k3s_version" \
@@ -38,7 +45,8 @@ curl -sfL https://raw.githubusercontent.com/k3s-io/k3s/$k3s_version/install.sh \
             agent \
             --node-ip "$ip_address" \
             --flannel-iface 'eth1' \
-            --kube-proxy-arg proxy-mode=ipvs
+            --kube-proxy-arg proxy-mode=ipvs \
+            # $k3s_extra_args
 
 # see the systemd unit.
 systemctl cat k3s-agent

@@ -1,12 +1,12 @@
 #!/bin/bash
 set -euxo pipefail
 
-extra_hosts="$1"; shift || true
+# extra_hosts="$1"; shift || true
 
-# set the extra hosts.
-cat >>/etc/hosts <<EOF
-$extra_hosts
-EOF
+# # set the extra hosts.
+# cat >>/etc/hosts <<EOF
+# $extra_hosts
+# EOF
 
 # prevent apt-get et al from asking questions.
 # NB even with this, you'll still get some warnings that you can ignore:
@@ -33,6 +33,9 @@ apt-get install -y curl
 
 # install the bash completion.
 apt-get install -y bash-completion
+
+# install strace.
+apt-get install -y strace
 
 # install vim.
 apt-get install -y --no-install-recommends vim

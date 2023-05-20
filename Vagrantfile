@@ -54,17 +54,16 @@ Vagrant.configure(2) do |config|
   masterNodes  = generate_nodesInfos(first_server_node_ip, master_cluster_number, 's')
   agent_nodes   = generate_nodesInfos(first_agent_node_ip, master_cluster_number, 'a')
 
-  config.vm.box = 'jj-ucll/debian11'
+  config.vm.box = 'generic/debian11'
   masterNodes.each do |name, fqdn, ip_address, n|
     config.vm.define name do |config|
       config.vm.provider 'vmware_workstation' do |vb, config|
         # vb.nested = true
         vb.memory = 8*1024
         vb.linked_clone = true
-        # vb.vmx["ethernet0.pcislotnumber"] = "33"
         vb.cpus = 4
         # vb.cpu_mode = 'host-passthrough'
-        vb.gui=true
+        vb.gui=false
       end
 
       config.vm.provider 'libvirt' do |lv, config|
@@ -94,10 +93,10 @@ Vagrant.configure(2) do |config|
       ]
       config.vm.provision 'shell', path: './provisions/provision-helm.sh', args: [helm_version] # NB this might not really be needed, as rancher has a HelmChart CRD.
       config.vm.provision 'shell', path: './provisions/provision-helmfile.sh', args: [helmfile_version]
-      config.vm.provision 'shell', path: './provisions/provision-k9s.sh', args: [k9s_version]
+      # config.vm.provision 'shell', path: './provisions/provision-k9s.sh', args: [k9s_version]
       if n == 1
-        config.vm.provision 'shell', path: './provisions/provision-kube-vip.sh', args: [kube_vip_version, server_vip]
-        config.vm.provision 'shell', path: './provisions/provision-metallb.sh', args: [metallb_chart_version, lb_ip_range]
+        # config.vm.provision 'shell', path: './provisions/provision-kube-vip.sh', args: [kube_vip_version, server_vip]
+        # config.vm.provision 'shell', path: './provisions/provision-metallb.sh', args: [metallb_chart_version, lb_ip_range]
         config.vm.provision 'shell', path: './provisions/provision-k8s-dashboard.sh', args: [k8s_dashboard_version]
       end
     end
@@ -110,6 +109,10 @@ Vagrant.configure(2) do |config|
       end
 
       config.vm.provider 'vmware_workstation' do |vb|
+        vb.linked_clone = true
+        vb.cpus = 2
+        # vb.cpu_mode = 'host-passthrough'
+        vb.gui=false
         vb.memory = 4*1024
       end
 
@@ -118,6 +121,7 @@ Vagrant.configure(2) do |config|
       config.vm.provision 'shell', path: './provisions/provision-base.sh', args: [extra_hosts]
       config.vm.provision 'shell', path: './provisions/provision-wireguard.sh'
       config.vm.provision 'shell', path: './provisions/provision-k3s-agent.sh', args: [
+        "cluster-join",
         k3s_channel,
         k3s_version,
         k3s_token,

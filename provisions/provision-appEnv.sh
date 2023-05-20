@@ -7,7 +7,8 @@ apt-get install -y wireguard
 
 helm repo add jenkins https://charts.jenkins.io
 helm repo update
-helm upgrade --install myjenkins jenkins/jenkins
+helm upgrade --install jenkins-4.3.23 jenkins/jenkins --kubeconfig /etc/rancher/k3s/k3s.yaml
+
 
 $ kubectl exec --namespace default -it svc/myjenkins -c jenkins -- /bin/cat /run/secrets/chart-admin-password && echo
 

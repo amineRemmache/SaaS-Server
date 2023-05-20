@@ -32,7 +32,14 @@ node('node') {
 
          echo 'Push to Repo'
          sh './dockerPushToRepo.sh'
+         # deploying app on kubernetes
+         echo "deploying app's k8s's manifests"
+         kubectl apply -f ../app/app-deployment.yml
+         kubectl apply -f ../app/app-service.yml
 
+         echo "deploying app's Database's k8s's manifests"
+         kubectl apply -f ../app/appDB-statefulset.yml
+         kubectl apply -f ../app/appDB-service.yml
          echo 'ssh to web server and tell it to pull new image'
          sh 'ssh deploy@xxxxx.xxxxx.com running/xxxxxxx/dockerRun.sh'
 
@@ -68,9 +75,3 @@ node('node') {
     }
 
 }
-Footer
-© 2023 GitHub, Inc.
-Footer navigation
-Terms
-Privacy
-S
