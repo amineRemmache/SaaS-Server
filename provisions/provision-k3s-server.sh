@@ -80,7 +80,7 @@ $SHELL -c 'node_name=$(hostname); echo "waiting for node $node_name to be ready.
 
 # wait for the kube-dns pod to be Running.
 # e.g. coredns-fb8b8dccf-rh4fg   1/1     Running   0          33m
-$SHELL -c 'while [ -z "$(kubectl get pods --selector k8s-app=kube-dns --namespace kube-system | grep -E "\s+Running\s+")" ]; do sleep 3; done'
+$SHELL -c 'while [ -z "$(sudo kubectl get pods --selector k8s-app=kube-dns --namespace kube-system | grep -E "\s+Running\s+")" ]; do sleep 3; done'
 
 # install traefik as the k8s ingress controller.
 # NB this is changing the /var/lib/rancher/k3s/server/manifests/traefik.yaml file

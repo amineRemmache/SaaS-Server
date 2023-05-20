@@ -54,16 +54,17 @@ Vagrant.configure(2) do |config|
   masterNodes  = generate_nodesInfos(first_server_node_ip, master_cluster_number, 's')
   agent_nodes   = generate_nodesInfos(first_agent_node_ip, master_cluster_number, 'a')
 
-  config.vm.box = 'generic/debian11'
+  config.vm.box = 'jj-ucll/debian11'
   masterNodes.each do |name, fqdn, ip_address, n|
     config.vm.define name do |config|
       config.vm.provider 'vmware_workstation' do |vb, config|
         # vb.nested = true
         vb.memory = 8*1024
         vb.linked_clone = true
+        # vb.vmx["ethernet0.pcislotnumber"] = "33"
         vb.cpus = 4
         # vb.cpu_mode = 'host-passthrough'
-        vb.gui=false
+        vb.gui=true
       end
 
       config.vm.provider 'libvirt' do |lv, config|
