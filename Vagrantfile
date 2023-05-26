@@ -27,9 +27,9 @@ helmfile_version = 'v0.144.0' # https://github.com/roboll/helmfile/releases
 k8s_dashboard_version = 'v2.7.0' # https://github.com/kubernetes/dashboard/releases
 # NB make sure you use a version compatible with k3s. # see https://github.com/etcd-io/etcd/releases
 etcdctl_version = 'v3.5.7'
-k9s_version = 'v0.27.3' # https://github.com/derailed/k9s/releases
- krew_version = 'v0.4.3' # see https://github.com/kubernetes-sigs/krew/releases
-metallb_chart_version = '4.1.20' # see https://artifacthub.io/packages/helm/bitnami/metallb
+# k9s_version = 'v0.27.3' # https://github.com/derailed/k9s/releases
+# krew_version = 'v0.4.3' # see https://github.com/kubernetes-sigs/krew/releases
+# metallb_chart_version = '4.1.20' # see https://artifacthub.io/packages/helm/bitnami/metallb
 
 # set the flannel backend. use one of:
 # * host-gw:          non-secure network (needs ethernet (L2) connectivity between nodes).
@@ -54,7 +54,7 @@ Vagrant.configure(2) do |config|
   masterNodes  = generate_nodesInfos(first_server_node_ip, master_cluster_number, 's')
   agent_nodes   = generate_nodesInfos(first_agent_node_ip, master_cluster_number, 'a')
 
-  config.vm.box = 'generic/debian11'
+  config.vm.box = 'jj-ucll/debian11'
   masterNodes.each do |name, fqdn, ip_address, n|
     config.vm.define name do |config|
       config.vm.provider 'vmware_workstation' do |vb, config|
@@ -89,7 +89,6 @@ Vagrant.configure(2) do |config|
         k3s_token,
         flannel_backend,
         ip_address,
-        krew_version
       ]
       config.vm.provision 'shell', path: './provisions/provision-helm.sh', args: [helm_version] # NB this might not really be needed, as rancher has a HelmChart CRD.
       config.vm.provision 'shell', path: './provisions/provision-helmfile.sh', args: [helmfile_version]
