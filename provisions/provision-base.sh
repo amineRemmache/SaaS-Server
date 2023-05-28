@@ -1,6 +1,6 @@
 #!/bin/bash
 set -euxo pipefail
-
+sudo loadkeys fr
 # extra_hosts="$1"; shift || true
 
 # # set the extra hosts.

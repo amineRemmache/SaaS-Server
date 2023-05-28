@@ -48,16 +48,19 @@ extra_hosts = """
 """
 Vagrant.configure(2) do |config|
   master_cluster_number  = 1
-  agent_cluster_number   = 1
+  agent_cluster_number   = 2
   first_server_node_ip  = '10.11.0.11'
   first_agent_node_ip   = '10.11.0.21'
   masterNodes  = generate_nodesInfos(first_server_node_ip, master_cluster_number, 's')
-  agent_nodes   = generate_nodesInfos(first_agent_node_ip, master_cluster_number, 'a')
+  agent_nodes   = generate_nodesInfos(first_agent_node_ip, agent_cluster_number, 'a')
 
-  config.vm.box = 'jj-ucll/debian11'
+  config.vm.box = 'generic/debian11'
+  config.vm.box_version = "4.2.14"
+  # config.vm.box = 'jj-ucll/debian11'
   masterNodes.each do |name, fqdn, ip_address, n|
     config.vm.define name do |config|
-      config.vm.provider 'vmware_workstation' do |vb, config|
+      # config.vm.provider 'vmware_workstation' do |vb, config|
+      config.vm.provider 'vmware_desktop' do |vb, config|
         # vb.nested = true
         vb.memory = 8*1024
         vb.linked_clone = true
