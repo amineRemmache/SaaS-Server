@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euxo pipefail
+set -uxo pipefail
 
 k3s_command="$1"; shift
 k3s_channel="${1:-latest}"; shift
@@ -72,7 +72,7 @@ systemctl cat k3s
 # check whether this system has the k3s requirements.
 # NB we ignore the result for now, because its bogus on debian 11.
 #    see https://github.com/k3s-io/k3s/issues/3897
-k3s check-config || true
+sudo k3s check-config || true
 
 # wait for this node to be Ready.
 # e.g. s1     Ready    control-plane,master   3m    v1.26.2+k3s1
@@ -92,8 +92,8 @@ $SHELL -c 'while [ -z "$(sudo kubectl get pods --selector k8s-app=kube-dns --nam
 # see https://github.com/k3s-io/k3s/blob/v1.26.2+k3s1/manifests/traefik.yaml
 # see https://github.com/traefik/traefik-helm-chart/blob/v20.3.1/traefik/values.yaml
 echo 'configuring traefik...'
-apt-get install -y python3-yaml
-python3 - <<'EOF'
+sudo apt-get install -y python3-yaml
+sudo python3 - <<'EOF'
 import difflib
 import io
 import sys
@@ -153,7 +153,7 @@ config = config.getvalue()
 sys.stdout.writelines(difflib.unified_diff(config_orig.splitlines(1), config.splitlines(1)))
 open(config_path, 'w', encoding='utf-8').write(config)
 EOF
-
+echo "you reached the line 156"
 # create the traefik ingress to access the traefik api/dashboard endpoints.
 # NB you cannot use kubectl apply here because the traefik CRDs are created
 #    from a non control-plane node. that's why this uses a local manifest
@@ -188,7 +188,7 @@ spec:
         - name: api@internal
           kind: TraefikService
 EOF
-
+echo "you reached the line 191"
 # install the krew kubectl package manager.
 echo "installing the krew $krew_version kubectl package manager..."
 apt-get install -y --no-install-recommends git-core
@@ -200,11 +200,11 @@ cat >/etc/profile.d/krew.sh <<'EOF'
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 EOF
 source /etc/profile.d/krew.sh
-kubectl krew version
+sudo kubectl krew version
 
 # install the bash completion scripts.
 crictl completion bash >/usr/share/bash-completion/completions/crictl
-kubectl completion bash >/usr/share/bash-completion/completions/kubectl
+sudo kubectl completion bash >/usr/share/bash-completion/completions/kubectl
 
 # symlink the default kubeconfig path so local tools like k9s can easily
 # find it without exporting the KUBECONFIG environment variable.
@@ -238,59 +238,59 @@ yaml.dump(d, open('/vagrant/tmp/admin.conf', 'w'), default_flow_style=False)
 EOF
 
 # show cluster-info.
-kubectl cluster-info
+sudo kubectl cluster-info
 
 # list etcd members.
-etcdctl --write-out table member list
+sudo etcdctl --write-out table member list
 
 # show the endpoint status.
-etcdctl --write-out table endpoint status
+sudo etcdctl --write-out table endpoint status
 
 # list nodes.
-kubectl get nodes -o wide
+sudo kubectl get nodes -o wide
 
 # rbac info.
-kubectl get serviceaccount --all-namespaces
-kubectl get role --all-namespaces
-kubectl get rolebinding --all-namespaces
-kubectl get rolebinding --all-namespaces -o json | jq .items[].subjects
-kubectl get clusterrole --all-namespaces
-kubectl get clusterrolebinding --all-namespaces
-kubectl get clusterrolebinding --all-namespaces -o json | jq .items[].subjects
+sudo kubectl get serviceaccount --all-namespaces
+sudo kubectl get role --all-namespaces
+sudo kubectl get rolebinding --all-namespaces
+sudo kubectl get rolebinding --all-namespaces -o json | jq .items[].subjects
+sudo kubectl get clusterrole --all-namespaces
+sudo kubectl get clusterrolebinding --all-namespaces
+sudo kubectl get clusterrolebinding --all-namespaces -o json | jq .items[].subjects
 
 # rbac access matrix.
 # see https://github.com/corneliusweig/rakkess/blob/master/doc/USAGE.md
-kubectl krew install access-matrix
-kubectl access-matrix version --full
-kubectl access-matrix # at cluster scope.
-kubectl access-matrix --namespace default
-kubectl access-matrix --sa kubernetes-dashboard --namespace kubernetes-dashboard
+sudo kubectl krew install access-matrix
+sudo kubectl access-matrix version --full
+sudo kubectl access-matrix # at cluster scope.
+sudo kubectl access-matrix --namespace default
+sudo kubectl access-matrix --sa kubernetes-dashboard --namespace kubernetes-dashboard
 
 # list system secrets.
-kubectl -n kube-system get secret
+sudo kubectl -n kube-system get secret
 
 # list all objects.
 # NB without this hugly redirect the kubectl output will be all messed
 #    when used from a vagrant session.
-kubectl get all --all-namespaces
+sudo kubectl get all --all-namespaces
 
 # really get all objects.
 # see https://github.com/corneliusweig/ketall/blob/master/doc/USAGE.md
-kubectl krew install get-all
-kubectl get-all
+sudo kubectl krew install get-all
+sudo kubectl get-all
 
 # list services.
-kubectl get svc
+sudo kubectl get svc
 
 # list running pods.
-kubectl get pods --all-namespaces -o wide
+sudo kubectl get pods --all-namespaces -o wide
 
 # list runnnig pods.
-crictl pods
+sudo crictl pods
 
 # list running containers.
-crictl ps
-ctr containers ls
+sudo crictl ps
+sudo ctr containers ls
 
 # show listening ports.
 ss -n --tcp --listening --processes
@@ -305,6 +305,6 @@ wg
 free
 
 # show versions.
-kubectl version --output=yaml
-crictl version
-ctr version
+sudo kubectl version --output=yaml
+sudo crictl version
+sudo ctr version

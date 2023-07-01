@@ -28,7 +28,7 @@ k8s_dashboard_version = 'v2.7.0' # https://github.com/kubernetes/dashboard/relea
 # NB make sure you use a version compatible with k3s. # see https://github.com/etcd-io/etcd/releases
 etcdctl_version = 'v3.5.7'
 # k9s_version = 'v0.27.3' # https://github.com/derailed/k9s/releases
-# krew_version = 'v0.4.3' # see https://github.com/kubernetes-sigs/krew/releases
+krew_version = 'v0.4.3' # see https://github.com/kubernetes-sigs/krew/releases
 # metallb_chart_version = '4.1.20' # see https://artifacthub.io/packages/helm/bitnami/metallb
 
 # set the flannel backend. use one of:

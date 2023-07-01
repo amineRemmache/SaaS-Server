@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euxo pipefail
+set -uxo pipefail
 
 k3s_command="$1"; shift
 k3s_channel="$1"; shift
@@ -54,15 +54,15 @@ systemctl cat k3s-agent
 # check whether this system has the k3s requirements.
 # NB we ignore the result for now, because its bogus on debian 11.
 #    see https://github.com/k3s-io/k3s/issues/3897
-k3s check-config || true
+sudo k3s check-config || true
 
 # NB do not try to use kubectl on a agent node, as kubectl does not work on a
 #    agent node without a proper kubectl configuration (which you could copy
 #    from the server).
 
 # install the bash completion scripts.
-crictl completion bash >/usr/share/bash-completion/completions/crictl
-kubectl completion bash >/usr/share/bash-completion/completions/kubectl
+sudo crictl completion bash >/usr/share/bash-completion/completions/crictl
+sudo kubectl completion bash >/usr/share/bash-completion/completions/kubectl
 
 # list runnnig pods.
 crictl pods

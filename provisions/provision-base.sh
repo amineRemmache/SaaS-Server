@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euxo pipefail
+set -uxo pipefail
 sudo loadkeys fr
 # extra_hosts="$1"; shift || true
 
